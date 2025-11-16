@@ -26,8 +26,8 @@
     .banner h2 { font-size: 1.5rem; font-weight: bold; margin-bottom: 0.5rem; }
     .form-group { margin-bottom: 1rem; }
     .form-group label { display: block; font-weight: 600; margin-bottom: 0.5rem; color: #374151; }
-    .form-input { width: 100%; padding: 0.75rem 1rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 1rem; }
-    .form-input:focus { outline: none; border-color: #3b82f6; }
+    .form-input, .form-select { width: 100%; padding: 0.75rem 1rem; border: 2px solid #e5e7eb; border-radius: 0.5rem; font-size: 1rem; }
+    .form-input:focus, .form-select:focus { outline: none; border-color: #3b82f6; }
     .grid { display: grid; gap: 1rem; }
     .grid-2 { grid-template-columns: 1fr; }
     @media (min-width: 768px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
@@ -49,10 +49,12 @@
     .text-red { color: #dc2626; }
     .text-blue { color: #2563eb; }
     .text-gray { color: #6b7280; }
-    .transaction-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: #f9fafb; border-radius: 0.5rem; margin-bottom: 0.5rem; }
+    .text-orange { color: #ea580c; }
+    .transaction-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: #f9fafb; border-radius: 0.5rem; margin-bottom: 0.5rem; border-left: 4px solid #e5e7eb; }
     .transaction-left { flex: 1; }
     .transaction-date { font-weight: 600; margin-bottom: 0.25rem; }
     .transaction-detail { font-size: 0.875rem; color: #6b7280; }
+    .transaction-category { display: inline-block; padding: 0.125rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600; margin-top: 0.25rem; }
     .transaction-right { text-align: right; margin-right: 0.5rem; }
     .transaction-delete { background: none; border: none; color: #dc2626; font-size: 1.5rem; cursor: pointer; padding: 0 0.5rem; }
     .transaction-delete:hover { color: #991b1b; }
@@ -66,10 +68,19 @@
     .info-box.green { background: #f0fdf4; }
     .info-box.blue { background: #eff6ff; }
     .info-box.red { background: #fef2f2; }
+    .info-box.orange { background: #fff7ed; }
     .info-box p { font-weight: 600; margin-bottom: 0.5rem; }
     .info-box ul, .info-box ol { margin-left: 1.5rem; font-size: 0.875rem; }
     .info-box li { margin-bottom: 0.25rem; }
     .repartition-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: #f9fafb; border-radius: 0.5rem; margin-bottom: 0.5rem; }
+    .category-stat { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f9fafb; border-radius: 0.5rem; margin-bottom: 0.5rem; border-left: 4px solid; }
+    .progress-bar { width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; margin-top: 0.5rem; }
+    .progress-fill { height: 100%; background: #3b82f6; transition: width 0.3s; }
+    .alert { padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; font-weight: 600; }
+    .alert.success { background: #d1fae5; color: #065f46; }
+    .alert.warning { background: #fef3c7; color: #92400e; }
+    .alert.danger { background: #fee2e2; color: #991b1b; }
+    .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -86,176 +97,251 @@
       <button onclick="showPage('settings')" id="btnSettings" class="tab">⚙️ Paramètres</button>
     </div>
 
-      <div id="pageSaisie">
-        <div class="banner blue">
-          <h2>Saisie Quotidienne</h2>
-          <p>Enregistre tes transactions en 2 minutes</p>
+    <div id="pageSaisie">
+      <div class="banner blue">
+        <h2>Saisie Quotidienne</h2>
+        <p>Enregistre tes transactions en 2 minutes</p>
+      </div>
+
+      <div class="card">
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="dateInput" class="form-input">
         </div>
 
-        <div class="card">
+        <div class="grid grid-2">
           <div class="form-group">
-            <label>Date</label>
-            <input type="date" id="dateInput" class="form-input">
+            <label>💰 Entrée (<span class="currency">FCFA</span>)</label>
+            <input type="number" id="entreeInput" placeholder="Montant reçu" class="form-input">
           </div>
-
-          <div class="grid grid-2">
-            <div class="form-group">
-              <label>Entrée (<span class="currency">FCFA</span>)</label>
-              <input type="number" id="entreeInput" placeholder="Montant reçu" class="form-input">
-            </div>
-            <div class="form-group">
-              <label>Source</label>
-              <input type="text" id="sourceInput" placeholder="D'où vient l'argent" class="form-input">
-            </div>
+          <div class="form-group">
+            <label>📦 Source / Offre / Service</label>
+            <input type="text" id="sourceInput" placeholder="D'où vient l'argent" class="form-input">
           </div>
-
-          <div class="grid grid-2">
-            <div class="form-group">
-              <label>Sortie (<span class="currency">FCFA</span>)</label>
-              <input type="number" id="sortieInput" placeholder="Montant dépensé" class="form-input">
-            </div>
-            <div class="form-group">
-              <label>Motif</label>
-              <input type="text" id="motifInput" placeholder="Pourquoi cette dépense" class="form-input">
-            </div>
-          </div>
-
-          <button onclick="addTransaction()" class="btn btn-primary">✅ Enregistrer</button>
         </div>
 
-        <div class="card">
-          <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">Transactions récentes</h3>
-          <div id="transactionsList" class="list-container"></div>
+        <div class="grid grid-2">
+          <div class="form-group">
+            <label>💸 Sortie (<span class="currency">FCFA</span>)</label>
+            <input type="number" id="sortieInput" placeholder="Montant dépensé" class="form-input">
+          </div>
+          <div class="form-group">
+            <label>🏷️ Catégorie de dépense</label>
+            <select id="categoryInput" class="form-select">
+              <option value="">-- Choisir une catégorie --</option>
+              <option value="education">📚 Éducation</option>
+              <option value="business">💼 Business</option>
+              <option value="vie-courante">🏠 Vie courante</option>
+              <option value="transport">🚗 Transport</option>
+              <option value="personnel">👕 Personnel</option>
+              <option value="investissement">💰 Investissement</option>
+              <option value="dons">🎁 Dons/Aides</option>
+              <option value="abonnements">📱 Abonnements</option>
+              <option value="voyage">✈️ Voyage</option>
+              <option value="autre">❓ Autre</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>📝 Motif / Description</label>
+          <input type="text" id="motifInput" placeholder="Pourquoi cette transaction" class="form-input">
+        </div>
+
+        <button onclick="addTransaction()" class="btn btn-primary">✅ Enregistrer</button>
+      </div>
+
+      <div class="card">
+        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">Transactions récentes</h3>
+        <div id="transactionsList" class="list-container"></div>
+      </div>
+    </div>
+
+    <div id="pageDashboard" style="display: none;">
+      <div class="banner purple">
+        <h2>Dashboard Financier</h2>
+        <p>Vue d'ensemble et analyses</p>
+      </div>
+
+      <div id="alertsContainer"></div>
+
+      <div class="grid grid-3">
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="text-gray">Total Entrées</span>
+            <span style="font-size: 1.5rem;">📈</span>
+          </div>
+          <div id="totalEntrees" class="stat-value text-green">0 FCFA</div>
+          <div id="compareEntrees" style="font-size: 0.875rem; margin-top: 0.5rem; color: #6b7280;"></div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="text-gray">Total Sorties</span>
+            <span style="font-size: 1.5rem;">📉</span>
+          </div>
+          <div id="totalSorties" class="stat-value text-red">0 FCFA</div>
+          <div id="compareSorties" style="font-size: 0.875rem; margin-top: 0.5rem; color: #6b7280;"></div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <span class="text-gray">Recette Nette</span>
+            <span style="font-size: 1.5rem;">💰</span>
+          </div>
+          <div id="totalNet" class="stat-value text-blue">0 FCFA</div>
+          <div id="compareNet" style="font-size: 0.875rem; margin-top: 0.5rem; color: #6b7280;"></div>
         </div>
       </div>
 
-      <div id="pageDashboard" style="display: none;">
-        <div class="banner purple">
-          <h2>Dashboard</h2>
-          <p>Vue d'ensemble</p>
-        </div>
+      <div class="card">
+        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">📊 Dépenses par Catégorie</h3>
+        <div id="categoriesStats"></div>
+      </div>
 
-        <div class="grid grid-3">
-          <div class="stat-card">
-            <div class="stat-header">
-              <span class="text-gray">Entrées</span>
-              <span style="font-size: 1.5rem;">📈</span>
-            </div>
-            <div id="totalEntrees" class="stat-value text-green">0 FCFA</div>
-          </div>
+      <div class="card">
+        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">🎯 Répartition Automatique 40/10/10/20/10/10</h3>
+        <div id="repartitionList"></div>
+      </div>
 
-          <div class="stat-card">
-            <div class="stat-header">
-              <span class="text-gray">Sorties</span>
-              <span style="font-size: 1.5rem;">📉</span>
-            </div>
-            <div id="totalSorties" class="stat-value text-red">0 FCFA</div>
-          </div>
+      <div class="card">
+        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">🏆 Top 3 Dépenses du Mois</h3>
+        <div id="top3Depenses"></div>
+      </div>
+    </div>
 
-          <div class="stat-card">
-            <div class="stat-header">
-              <span class="text-gray">Net</span>
-              <span style="font-size: 1.5rem;">💰</span>
-            </div>
-            <div id="totalNet" class="stat-value text-blue">0 FCFA</div>
-          </div>
-        </div>
+    <div id="pageSop" style="display: none;">
+      <div class="banner orange">
+        <h2>SOP - Routines Financières</h2>
+        <p>Procédures guidées pour gérer tes finances</p>
+      </div>
 
-        <div class="card">
-          <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">Répartition 40/10/10/20/10/10</h3>
-          <div id="repartitionList"></div>
+      <div class="sop-section">
+        <h3 class="sop-title">🔄 Routine Quotidienne (2 minutes)</h3>
+        <div class="sop-content">
+          <p><strong>1.</strong> Ouvrir l'onglet Saisie</p>
+          <p><strong>2.</strong> Remplir Date, Entrée/Sortie, Catégorie, Motif</p>
+          <p><strong>3.</strong> Enregistrer la transaction</p>
+          <p><strong>4.</strong> Vérifier la recette journalière</p>
         </div>
       </div>
 
-      <div id="pageSop" class="space-y-4" style="display: none;">
-        <div class="bg-orange-600 rounded-lg p-6 text-white">
-          <h2 class="text-2xl font-bold">SOP - Routines</h2>
-          <p>Procédures guidées</p>
+      <div class="sop-section">
+        <h3 class="sop-title">📅 Revue Hebdomadaire (Dimanche - 10 min)</h3>
+        <div class="info-box green">
+          <p>✅ Vérifie dans le Dashboard :</p>
+          <ul>
+            <li>Total entrées et sorties de la semaine</li>
+            <li>Recette nette (positif ou négatif ?)</li>
+            <li>Catégorie qui coûte le plus</li>
+            <li>Top 3 des dépenses</li>
+          </ul>
         </div>
+        <div class="info-box blue">
+          <p>❓ Réponds à ces 5 questions :</p>
+          <ol>
+            <li>Qu'est-ce qui m'a coûté le plus cette semaine ?</li>
+            <li>Est-ce que mes dépenses correspondent à mes priorités ?</li>
+            <li>Quelle entrée je peux multiplier ×2 ?</li>
+            <li>Quelle dépense inutile je peux éliminer ?</li>
+            <li>Que faire la semaine prochaine pour améliorer ?</li>
+          </ol>
+        </div>
+        <div class="info-box orange">
+          <p>🎯 Prends 1 micro-décision :</p>
+          <p style="font-weight: normal;">Augmenter les prix ? Lancer un service ? Réduire une dépense ? Investir une petite somme ? Apprendre quelque chose ?</p>
+        </div>
+      </div>
 
-        <div class="bg-white rounded-lg shadow-lg p-6">
-          <h3 class="text-xl font-bold mb-4">🔄 Quotidienne (2 min)</h3>
-          <div class="space-y-2 pl-4 border-l-4 border-blue-500">
-            <p><strong>1.</strong> Ouvrir Saisie</p>
-            <p><strong>2.</strong> Remplir les champs</p>
-            <p><strong>3.</strong> Enregistrer</p>
+      <div class="sop-section">
+        <h3 class="sop-title">📊 Revue Mensuelle (1er du mois - 20 min)</h3>
+        <div class="sop-content">
+          <p>✓ Vérifier les cumuls mensuels</p>
+          <p>✓ Analyser les catégories de dépenses</p>
+          <p>✓ Vérifier les répartitions 40/10/10/20/10/10</p>
+          <p>✓ Comparer avec le mois précédent</p>
+          <p>✓ Voir l'évolution sur 3 mois</p>
+        </div>
+        <div class="info-box blue" style="margin-top: 1rem;">
+          <p>🎯 Décider :</p>
+          <ul style="font-weight: normal;">
+            <li>Objectif financier du mois prochain</li>
+            <li>Plan d'action business (une seule priorité)</li>
+            <li>Zone où investir (éducation, business, crypto...)</li>
+            <li>Budget par catégorie</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="sop-section">
+        <h3 class="sop-title">🚀 Revue Trimestrielle (Chaque 90 jours)</h3>
+        <div class="info-box red">
+          <p>🔍 Questions critiques :</p>
+          <ol>
+            <li>Est-ce que mes revenus ont augmenté sur 3 mois ?</li>
+            <li>Quelle offre m'a rapporté le plus ?</li>
+            <li>Quelle catégorie de dépense est devenue inutile ?</li>
+            <li>Quel investissement a été le plus rentable ?</li>
+            <li>Quelle opportunité ai-je ratée ?</li>
+            <li>Mes dépenses suivent-elles mes objectifs de vie ?</li>
+          </ol>
+        </div>
+        <div class="info-box orange" style="margin-top: 1rem;">
+          <p>💡 Décisions stratégiques à prendre :</p>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; font-weight: normal;">
+            <div>• Améliorer une offre</div>
+            <div>• Arrêter une dépense</div>
+            <div>• Augmenter mes prix</div>
+            <div>• Réinvestir davantage</div>
+            <div>• Épargner plus</div>
+            <div>• Optimiser mon style de vie</div>
           </div>
         </div>
+      </div>
+    </div>
 
-        <div class="bg-white rounded-lg shadow-lg p-6">
-          <h3 class="text-xl font-bold mb-4">📅 Hebdomadaire (10 min)</h3>
-          <div class="bg-green-50 p-4 rounded-lg mb-3">
-            <p class="font-semibold mb-2">Vérifie :</p>
-            <ul class="list-disc list-inside text-sm space-y-1">
-              <li>Total entrées/sorties semaine</li>
-              <li>Recette nette</li>
-              <li>Plus grosse dépense</li>
-            </ul>
-          </div>
-          <div class="bg-blue-50 p-4 rounded-lg">
-            <p class="font-semibold mb-2">5 Questions :</p>
-            <ol class="list-decimal list-inside text-sm space-y-1">
-              <li>Qu'est-ce qui a coûté le plus ?</li>
-              <li>Dépenses = priorités ?</li>
-              <li>Quelle entrée multiplier ?</li>
-              <li>Quelle dépense éliminer ?</li>
-              <li>Comment améliorer ?</li>
-            </ol>
-          </div>
-        </div>
+    <div id="pageSettings" style="display: none;">
+      <div class="banner gray">
+        <h2>Paramètres</h2>
+        <p>Configuration de l'application</p>
+      </div>
 
-        <div class="bg-white rounded-lg shadow-lg p-6">
-          <h3 class="text-xl font-bold mb-4">📊 Mensuelle (20 min)</h3>
-          <div class="space-y-1">
-            <p>✓ Cumuls mensuels</p>
-            <p>✓ Répartitions 40/10/10/20/10/10</p>
-            <p>✓ Évolution 3 mois</p>
-            <p>✓ Objectif du mois</p>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow-lg p-6">
-          <h3 class="text-xl font-bold mb-4">🚀 Trimestrielle (90 jours)</h3>
-          <div class="bg-red-50 p-4 rounded-lg">
-            <p class="font-semibold mb-2">Questions :</p>
-            <ol class="list-decimal list-inside text-sm space-y-1">
-              <li>Revenus augmentés ?</li>
-              <li>Meilleure offre ?</li>
-              <li>Dépense inutile ?</li>
-              <li>Investissement rentable ?</li>
-              <li>Opportunité ratée ?</li>
-            </ol>
+      <div class="card">
+        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">💱 Devise</h3>
+        <div class="grid grid-4" id="currencyButtons"></div>
+        <div style="margin-top: 1rem;">
+          <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Devise personnalisée :</label>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" id="customCurrency" placeholder="Ex: DZD, TND" class="form-input" style="flex: 1;">
+            <button onclick="setCustomCurrency()" class="btn-small" style="background: #3b82f6; color: white;">Valider</button>
           </div>
         </div>
       </div>
 
-      <div id="pageSettings" class="space-y-4" style="display: none;">
-        <div class="bg-gray-700 rounded-lg p-6 text-white">
-          <h2 class="text-2xl font-bold">Paramètres</h2>
-          <p>Configuration</p>
+      <div class="card">
+        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">📊 Statistiques</h3>
+        <div style="padding: 1rem; background: #f9fafb; border-radius: 0.5rem;">
+          <p style="font-weight: 600; margin-bottom: 0.5rem;">Total transactions : <span id="transCount">0</span></p>
+          <p style="font-weight: 600; margin-bottom: 0.5rem;">Depuis : <span id="firstDate">--</span></p>
+          <p style="font-weight: 600;">Catégorie préférée : <span id="favCategory">--</span></p>
         </div>
+      </div>
 
-        <div class="bg-white rounded-lg shadow-lg p-6">
-          <h3 class="text-xl font-bold mb-4">Devise</h3>
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-2" id="currencyButtons"></div>
-          <div class="mt-4">
-            <label class="block font-semibold mb-2">Personnalisée :</label>
-            <div class="flex gap-2">
-              <input type="text" id="customCurrency" placeholder="Ex: DZD" class="flex-1 px-4 py-2 border-2 rounded-lg">
-              <button onclick="setCustomCurrency()" class="px-6 py-2 bg-blue-600 text-white rounded-lg font-bold">OK</button>
-            </div>
-          </div>
-        </div>
+      <div class="card">
+        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">💾 Gestion des données</h3>
+        <button onclick="exportData()" class="btn-small" style="width: 100%; margin-bottom: 0.5rem; background: #10b981; color: white;">
+          📥 Télécharger mes données (CSV)
+        </button>
+        <button onclick="resetData()" class="btn btn-danger">
+          🗑️ Réinitialiser toutes les données
+        </button>
+      </div>
 
-        <div class="bg-white rounded-lg shadow-lg p-6">
-          <h3 class="text-xl font-bold mb-4">Données</h3>
-          <div class="p-4 bg-gray-50 rounded-lg mb-3">
-            <p class="font-semibold">Transactions : <span id="transCount">0</span></p>
-          </div>
-          <button onclick="resetData()" class="w-full py-3 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700">
-            Réinitialiser
-          </button>
-        </div>
+      <div style="padding: 1rem; background: #eff6ff; border-radius: 0.5rem; border: 2px solid #3b82f6;">
+        <p style="font-weight: 600; color: #1e40af; margin-bottom: 0.5rem;">💡 À propos</p>
+        <p style="font-size: 0.875rem; color: #1e3a8a;">Système Financier Personnel v2.0</p>
+        <p style="font-size: 0.875rem; color: #1e3a8a;">Plan automatique 40/10/10/20/10/10</p>
+        <p style="font-size: 0.875rem; color: #1e3a8a; margin-top: 0.5rem;">✨ Nouveau : Catégories, analyses et alertes intelligentes</p>
       </div>
     </div>
   </div>
@@ -263,6 +349,19 @@
   <script>
     let currency = 'FCFA';
     let transactions = [];
+
+    const categories = {
+      'education': { name: '📚 Éducation', color: '#f59e0b' },
+      'business': { name: '💼 Business', color: '#3b82f6' },
+      'vie-courante': { name: '🏠 Vie courante', color: '#10b981' },
+      'transport': { name: '🚗 Transport', color: '#ef4444' },
+      'personnel': { name: '👕 Personnel', color: '#8b5cf6' },
+      'investissement': { name: '💰 Investissement', color: '#14b8a6' },
+      'dons': { name: '🎁 Dons/Aides', color: '#ec4899' },
+      'abonnements': { name: '📱 Abonnements', color: '#6366f1' },
+      'voyage': { name: '✈️ Voyage', color: '#f97316' },
+      'autre': { name: '❓ Autre', color: '#6b7280' }
+    };
 
     function init() {
       const savedCurrency = localStorage.getItem('currency');
@@ -303,7 +402,7 @@
       } else if (page === 'settings') {
         document.getElementById('pageSettings').style.display = 'block';
         document.getElementById('btnSettings').className = 'tab active settings';
-        document.getElementById('transCount').textContent = transactions.length;
+        updateSettings();
       }
     }
 
@@ -312,6 +411,7 @@
       const sortie = parseFloat(document.getElementById('sortieInput').value) || 0;
       const source = document.getElementById('sourceInput').value;
       const motif = document.getElementById('motifInput').value;
+      const category = document.getElementById('categoryInput').value;
       const date = document.getElementById('dateInput').value;
       const recette = entree - sortie;
 
@@ -322,6 +422,7 @@
         source: source,
         sortie: sortie,
         motif: motif,
+        category: category,
         recette: recette
       };
 
@@ -332,38 +433,44 @@
       document.getElementById('sourceInput').value = '';
       document.getElementById('sortieInput').value = '';
       document.getElementById('motifInput').value = '';
+      document.getElementById('categoryInput').value = '';
       document.getElementById('dateInput').value = new Date().toISOString().split('T')[0];
 
       renderTransactions();
     }
 
     function deleteTransaction(id) {
-      transactions = transactions.filter(t => t.id !== id);
-      localStorage.setItem('transactions', JSON.stringify(transactions));
-      renderTransactions();
+      if (confirm('Supprimer cette transaction ?')) {
+        transactions = transactions.filter(t => t.id !== id);
+        localStorage.setItem('transactions', JSON.stringify(transactions));
+        renderTransactions();
+      }
     }
 
     function renderTransactions() {
       const list = document.getElementById('transactionsList');
       if (transactions.length === 0) {
-        list.innerHTML = '<div class="empty-state">Aucune transaction</div>';
+        list.innerHTML = '<div class="empty-state">Aucune transaction enregistrée</div>';
         return;
       }
 
-      list.innerHTML = transactions.slice(0, 10).map(t => `
-        <div class="transaction-item">
+      list.innerHTML = transactions.slice(0, 10).map(t => {
+        const catInfo = categories[t.category] || { name: '', color: '#e5e7eb' };
+        return `
+        <div class="transaction-item" style="border-left-color: ${catInfo.color}">
           <div class="transaction-left">
             <div class="transaction-date">${new Date(t.date).toLocaleDateString('fr-FR')} ${t.recette < 0 ? '⚠️' : ''}</div>
             <div class="transaction-detail">${t.source} ${t.motif}</div>
+            ${t.category ? `<span class="transaction-category" style="background: ${catInfo.color}22; color: ${catInfo.color}">${catInfo.name}</span>` : ''}
           </div>
           <div class="transaction-right">
-            ${t.entree > 0 ? `<div style="color: #16a34a; font-weight: bold;">+${t.entree}</div>` : ''}
-            ${t.sortie > 0 ? `<div style="color: #dc2626; font-weight: bold;">-${t.sortie}</div>` : ''}
-            <div style="font-weight: 600; color: ${t.recette >= 0 ? '#2563eb' : '#dc2626'}">${t.recette} ${currency}</div>
+            ${t.entree > 0 ? `<div style="color: #16a34a; font-weight: bold;">+${t.entree.toLocaleString()}</div>` : ''}
+            ${t.sortie > 0 ? `<div style="color: #dc2626; font-weight: bold;">-${t.sortie.toLocaleString()}</div>` : ''}
+            <div style="font-weight: 600; color: ${t.recette >= 0 ? '#2563eb' : '#dc2626'}">${t.recette.toLocaleString()} ${currency}</div>
           </div>
           <button onclick="deleteTransaction(${t.id})" class="transaction-delete">×</button>
         </div>
-      `).join('');
+      `}).join('');
     }
 
     function updateDashboard() {
@@ -373,15 +480,57 @@
         return td.getMonth() === now.getMonth() && td.getFullYear() === now.getFullYear();
       });
 
+      const lastMonth = transactions.filter(t => {
+        const td = new Date(t.date);
+        const lm = new Date(now.getFullYear(), now.getMonth() - 1);
+        return td.getMonth() === lm.getMonth() && td.getFullYear() === lm.getFullYear();
+      });
+
       const totalE = thisMonth.reduce((sum, t) => sum + t.entree, 0);
       const totalS = thisMonth.reduce((sum, t) => sum + t.sortie, 0);
       const net = totalE - totalS;
+
+      const lastE = lastMonth.reduce((sum, t) => sum + t.entree, 0);
+      const lastS = lastMonth.reduce((sum, t) => sum + t.sortie, 0);
+      const lastNet = lastE - lastS;
 
       document.getElementById('totalEntrees').textContent = `${totalE.toLocaleString()} ${currency}`;
       document.getElementById('totalSorties').textContent = `${totalS.toLocaleString()} ${currency}`;
       document.getElementById('totalNet').textContent = `${net.toLocaleString()} ${currency}`;
       document.getElementById('totalNet').className = `stat-value ${net >= 0 ? 'text-blue' : 'text-red'}`;
 
+      // Comparaison avec mois précédent
+      if (lastE > 0) {
+        const diffE = totalE - lastE;
+        const percE = ((diffE / lastE) * 100).toFixed(1);
+        document.getElementById('compareEntrees').innerHTML = diffE >= 0 
+          ? `<span style="color: #16a34a;">↗ +${percE}% vs mois dernier</span>`
+          : `<span style="color: #dc2626;">↘ ${percE}% vs mois dernier</span>`;
+      }
+
+      if (lastS > 0) {
+        const diffS = totalS - lastS;
+        const percS = ((diffS / lastS) * 100).toFixed(1);
+        document.getElementById('compareSorties').innerHTML = diffS >= 0 
+          ? `<span style="color: #dc2626;">↗ +${percS}% vs mois dernier</span>`
+          : `<span style="color: #16a34a;">↘ ${percS}% vs mois dernier</span>`;
+      }
+
+      if (lastNet !== 0) {
+        const diffNet = net - lastNet;
+        const percNet = ((diffNet / Math.abs(lastNet)) * 100).toFixed(1);
+        document.getElementById('compareNet').innerHTML = diffNet >= 0 
+          ? `<span style="color: #16a34a;">↗ +${percNet}% vs mois dernier</span>`
+          : `<span style="color: #dc2626;">↘ ${percNet}% vs mois dernier</span>`;
+      }
+
+      // Alertes intelligentes
+      renderAlerts(totalE, totalS, net);
+
+      // Statistiques par catégorie
+      renderCategoryStats(thisMonth, totalS);
+
+      // Répartition
       const repartition = [
         { name: 'Compte Courant (40%)', value: net * 0.4 },
         { name: 'Investissement (10%)', value: net * 0.1 },
@@ -397,6 +546,112 @@
           <span style="font-weight: bold;">${r.value.toLocaleString()} ${currency}</span>
         </div>
       `).join('');
+
+      // Top 3 dépenses
+      renderTop3(thisMonth);
+    }
+
+    function renderAlerts(totalE, totalS, net) {
+      const alerts = document.getElementById('alertsContainer');
+      let html = '';
+
+      if (net < 0) {
+        html += '<div class="alert danger">⚠️ Attention ! Tes dépenses dépassent tes revenus ce mois-ci</div>';
+      } else if (net > 0 && totalE > 0) {
+        const ratio = (net / totalE) * 100;
+        if (ratio >= 30) {
+          html += '<div class="alert success">🔥 Excellent ! Tu épargnes ' + ratio.toFixed(0) + '% de tes revenus !</div>';
+        }
+      }
+
+      if (totalS > totalE * 0.8 && totalE > 0) {
+        html += '<div class="alert warning">⚡ Tu as dépensé 80% de tes revenus ce mois</div>';
+      }
+
+      alerts.innerHTML = html;
+    }
+
+    function renderCategoryStats(monthData, totalSorties) {
+      const catStats = {};
+      
+      monthData.forEach(t => {
+        if (t.sortie > 0 && t.category) {
+          if (!catStats[t.category]) {
+            catStats[t.category] = { total: 0, count: 0 };
+          }
+          catStats[t.category].total += t.sortie;
+          catStats[t.category].count++;
+        }
+      });
+
+      const sorted = Object.entries(catStats)
+        .map(([cat, data]) => ({
+          category: cat,
+          total: data.total,
+          count: data.count,
+          percent: totalSorties > 0 ? (data.total / totalSorties * 100) : 0
+        }))
+        .sort((a, b) => b.total - a.total);
+
+      const container = document.getElementById('categoriesStats');
+      
+      if (sorted.length === 0) {
+        container.innerHTML = '<div class="empty-state">Aucune dépense catégorisée ce mois</div>';
+        return;
+      }
+
+      container.innerHTML = sorted.map(item => {
+        const catInfo = categories[item.category] || { name: item.category, color: '#6b7280' };
+        return `
+          <div class="category-stat" style="border-left-color: ${catInfo.color}">
+            <div style="flex: 1;">
+              <div style="font-weight: 600; margin-bottom: 0.25rem;">${catInfo.name}</div>
+              <div style="font-size: 0.875rem; color: #6b7280;">${item.count} transaction(s) • ${item.percent.toFixed(1)}% du total</div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: ${item.percent}%; background: ${catInfo.color}"></div>
+              </div>
+            </div>
+            <div style="font-size: 1.25rem; font-weight: bold; color: ${catInfo.color};">
+              ${item.total.toLocaleString()} ${currency}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderTop3(monthData) {
+      const sorted = monthData
+        .filter(t => t.sortie > 0)
+        .sort((a, b) => b.sortie - a.sortie)
+        .slice(0, 3);
+
+      const container = document.getElementById('top3Depenses');
+      
+      if (sorted.length === 0) {
+        container.innerHTML = '<div class="empty-state">Aucune dépense ce mois</div>';
+        return;
+      }
+
+      const medals = ['🥇', '🥈', '🥉'];
+      
+      container.innerHTML = sorted.map((t, i) => {
+        const catInfo = t.category ? categories[t.category] : null;
+        return `
+          <div style="display: flex; align-items: center; padding: 1rem; background: #f9fafb; border-radius: 0.5rem; margin-bottom: 0.5rem;">
+            <div style="font-size: 2rem; margin-right: 1rem;">${medals[i]}</div>
+            <div style="flex: 1;">
+              <div style="font-weight: 600;">${t.motif || t.source || 'Sans description'}</div>
+              <div style="font-size: 0.875rem; color: #6b7280;">
+                ${new Date(t.date).toLocaleDateString('fr-FR')}
+                ${catInfo ? ` • ${catInfo.name}` : ''}
+              </div>
+            </div>
+            <div style="font-size: 1.5rem; font-weight: bold; color: #dc2626;">
+              ${t.sortie.toLocaleString()} ${currency}
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
     function updateCurrencyDisplay() {
@@ -430,13 +685,60 @@
       `).join('');
     }
 
+    function updateSettings() {
+      document.getElementById('transCount').textContent = transactions.length;
+      
+      if (transactions.length > 0) {
+        const dates = transactions.map(t => new Date(t.date)).sort((a, b) => a - b);
+        document.getElementById('firstDate').textContent = dates[0].toLocaleDateString('fr-FR');
+        
+        const catCount = {};
+        transactions.forEach(t => {
+          if (t.category) {
+            catCount[t.category] = (catCount[t.category] || 0) + 1;
+          }
+        });
+        
+        const favCat = Object.entries(catCount).sort((a, b) => b[1] - a[1])[0];
+        if (favCat) {
+          const catInfo = categories[favCat[0]];
+          document.getElementById('favCategory').textContent = catInfo.name;
+        }
+      }
+    }
+
+    function exportData() {
+      if (transactions.length === 0) {
+        alert('Aucune donnée à exporter');
+        return;
+      }
+
+      let csv = 'Date,Entrée,Source,Sortie,Catégorie,Motif,Recette\n';
+      
+      transactions.forEach(t => {
+        const catInfo = t.category ? categories[t.category].name : '';
+        csv += `${t.date},${t.entree},"${t.source}",${t.sortie},"${catInfo}","${t.motif}",${t.recette}\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `finances_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }
+
     function resetData() {
-      if (confirm('Supprimer toutes les données ?')) {
-        transactions = [];
-        localStorage.setItem('transactions', JSON.stringify(transactions));
-        renderTransactions();
-        updateDashboard();
-        document.getElementById('transCount').textContent = '0';
+      if (confirm('⚠️ ATTENTION ! Supprimer toutes les données ? Cette action est irréversible !')) {
+        if (confirm('Es-tu vraiment sûr ? Toutes tes transactions seront perdues !')) {
+          transactions = [];
+          localStorage.setItem('transactions', JSON.stringify(transactions));
+          renderTransactions();
+          updateDashboard();
+          updateSettings();
+          alert('✅ Toutes les données ont été supprimées');
+        }
       }
     }
 
