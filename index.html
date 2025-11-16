@@ -6,18 +6,22 @@
   <title>💰 Système Financier Personnel</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: system-ui, -apple-system, sans-serif; background: #f3f4f6; }
-    .container { max-width: 1152px; margin: 0 auto; padding: 1rem; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+    .auth-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1rem; }
+    .auth-card { background: white; border-radius: 1rem; box-shadow: 0 20px 60px rgba(0,0,0,0.3); padding: 2rem; max-width: 400px; width: 100%; }
+    .auth-card h1 { font-size: 2rem; margin-bottom: 0.5rem; text-align: center; }
+    .auth-card p { text-align: center; color: #6b7280; margin-bottom: 2rem; }
+    .container { max-width: 1152px; margin: 0 auto; padding: 1rem; display: none; }
+    .container.show { display: block; }
     .card { background: white; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1.5rem; margin-bottom: 1rem; }
-    .header { background: white; border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 1.5rem; margin-bottom: 1rem; }
+    .header { background: white; border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 1.5rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; }
     .header h1 { font-size: 1.875rem; font-weight: bold; color: #1f2937; }
     .header p { color: #6b7280; margin-top: 0.25rem; }
+    .logout-btn { padding: 0.5rem 1rem; background: #ef4444; color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; }
+    .logout-btn:hover { background: #dc2626; }
     .tabs { background: white; border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 0.5rem; margin-bottom: 1.5rem; display: flex; gap: 0.5rem; overflow-x: auto; }
     .tab { padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 600; border: none; cursor: pointer; background: #f3f4f6; color: #374151; white-space: nowrap; }
     .tab.active { background: #3b82f6; color: white; }
-    .tab.dashboard { background: #9333ea; }
-    .tab.sop { background: #ea580c; }
-    .tab.settings { background: #374151; }
     .banner { border-radius: 0.75rem; padding: 1.5rem; color: white; margin-bottom: 1rem; }
     .banner.blue { background: #3b82f6; }
     .banner.purple { background: #9333ea; }
@@ -33,15 +37,11 @@
     @media (min-width: 768px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
     .grid-3 { grid-template-columns: 1fr; }
     @media (min-width: 768px) { .grid-3 { grid-template-columns: repeat(3, 1fr); } }
-    .grid-4 { grid-template-columns: repeat(2, 1fr); }
-    @media (min-width: 768px) { .grid-4 { grid-template-columns: repeat(4, 1fr); } }
     .btn { width: 100%; padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: bold; border: none; cursor: pointer; font-size: 1rem; }
     .btn-primary { background: #3b82f6; color: white; }
     .btn-primary:hover { background: #2563eb; }
-    .btn-danger { background: #dc2626; color: white; }
-    .btn-danger:hover { background: #b91c1c; }
-    .btn-small { padding: 0.5rem 1rem; width: auto; background: #f3f4f6; color: #374151; }
-    .btn-small.active { background: #3b82f6; color: white; }
+    .btn-secondary { background: #6b7280; color: white; }
+    .btn-secondary:hover { background: #4b5563; }
     .stat-card { background: white; border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 1.5rem; }
     .stat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
     .stat-value { font-size: 1.875rem; font-weight: bold; }
@@ -49,7 +49,6 @@
     .text-red { color: #dc2626; }
     .text-blue { color: #2563eb; }
     .text-gray { color: #6b7280; }
-    .text-orange { color: #ea580c; }
     .transaction-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: #f9fafb; border-radius: 0.5rem; margin-bottom: 0.5rem; border-left: 4px solid #e5e7eb; }
     .transaction-left { flex: 1; }
     .transaction-date { font-weight: 600; margin-bottom: 0.25rem; }
@@ -57,43 +56,69 @@
     .transaction-category { display: inline-block; padding: 0.125rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 600; margin-top: 0.25rem; }
     .transaction-right { text-align: right; margin-right: 0.5rem; }
     .transaction-delete { background: none; border: none; color: #dc2626; font-size: 1.5rem; cursor: pointer; padding: 0 0.5rem; }
-    .transaction-delete:hover { color: #991b1b; }
     .list-container { max-height: 384px; overflow-y: auto; }
     .empty-state { text-align: center; color: #9ca3af; padding: 2rem; }
-    .sop-section { background: white; border-radius: 0.75rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 1.5rem; margin-bottom: 1rem; }
-    .sop-title { font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
-    .sop-content { padding-left: 1rem; border-left: 4px solid #3b82f6; }
-    .sop-content p { margin-bottom: 0.5rem; }
-    .info-box { padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; }
-    .info-box.green { background: #f0fdf4; }
-    .info-box.blue { background: #eff6ff; }
-    .info-box.red { background: #fef2f2; }
-    .info-box.orange { background: #fff7ed; }
-    .info-box p { font-weight: 600; margin-bottom: 0.5rem; }
-    .info-box ul, .info-box ol { margin-left: 1.5rem; font-size: 0.875rem; }
-    .info-box li { margin-bottom: 0.25rem; }
-    .repartition-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: #f9fafb; border-radius: 0.5rem; margin-bottom: 0.5rem; }
-    .category-stat { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f9fafb; border-radius: 0.5rem; margin-bottom: 0.5rem; border-left: 4px solid; }
-    .progress-bar { width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; margin-top: 0.5rem; }
-    .progress-fill { height: 100%; background: #3b82f6; transition: width 0.3s; }
     .alert { padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; font-weight: 600; }
     .alert.success { background: #d1fae5; color: #065f46; }
     .alert.warning { background: #fef3c7; color: #92400e; }
     .alert.danger { background: #fee2e2; color: #991b1b; }
-    .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; }
+    .category-stat { display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f9fafb; border-radius: 0.5rem; margin-bottom: 0.5rem; border-left: 4px solid; }
+    .progress-bar { width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; margin-top: 0.5rem; }
+    .progress-fill { height: 100%; background: #3b82f6; transition: width 0.3s; }
+    .loading { text-align: center; padding: 2rem; color: #6b7280; }
+    .error { background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; }
   </style>
 </head>
 <body>
-  <div class="container">
+  <!-- Auth Container -->
+  <div id="authContainer" class="auth-container">
+    <div class="auth-card">
+      <h1>💰 Finances</h1>
+      <p>Connecte-toi pour accéder à tes données</p>
+      
+      <div id="authError" class="error" style="display: none;"></div>
+      
+      <div id="loginForm">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="loginEmail" class="form-input" placeholder="ton@email.com">
+        </div>
+        <div class="form-group">
+          <label>Mot de passe</label>
+          <input type="password" id="loginPassword" class="form-input" placeholder="••••••••">
+        </div>
+        <button onclick="login()" class="btn btn-primary" style="margin-bottom: 0.5rem;">Se connecter</button>
+        <button onclick="showSignup()" class="btn btn-secondary">Créer un compte</button>
+      </div>
+
+      <div id="signupForm" style="display: none;">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="signupEmail" class="form-input" placeholder="ton@email.com">
+        </div>
+        <div class="form-group">
+          <label>Mot de passe (min 6 caractères)</label>
+          <input type="password" id="signupPassword" class="form-input" placeholder="••••••••">
+        </div>
+        <button onclick="signup()" class="btn btn-primary" style="margin-bottom: 0.5rem;">Créer mon compte</button>
+        <button onclick="showLogin()" class="btn btn-secondary">Retour à la connexion</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="mainApp" class="container">
     <div class="header">
-      <h1>💰 Système Financier Personnel</h1>
-      <p>Plan 40/10/10/20/10/10 • <span id="currencyDisplay">FCFA</span></p>
+      <div>
+        <h1>💰 Système Financier Personnel</h1>
+        <p>Plan 40/10/10/20/10/10 • <span id="currencyDisplay">FCFA</span> • <span id="userEmail"></span></p>
+      </div>
+      <button onclick="logout()" class="logout-btn">Déconnexion</button>
     </div>
 
     <div class="tabs">
       <button onclick="showPage('saisie')" id="btnSaisie" class="tab active">📝 Saisie</button>
       <button onclick="showPage('dashboard')" id="btnDashboard" class="tab">📊 Dashboard</button>
-      <button onclick="showPage('sop')" id="btnSop" class="tab">📋 SOP</button>
       <button onclick="showPage('settings')" id="btnSettings" class="tab">⚙️ Paramètres</button>
     </div>
 
@@ -112,10 +137,10 @@
         <div class="grid grid-2">
           <div class="form-group">
             <label>💰 Entrée (<span class="currency">FCFA</span>)</label>
-            <input type="number" id="entreeInput" placeholder="Montant reçu" class="form-input">
+            <input type="number" id="entreeInput" placeholder="Montant reçu" class="form-input" step="0.01">
           </div>
           <div class="form-group">
-            <label>📦 Source / Offre / Service</label>
+            <label>📦 Source</label>
             <input type="text" id="sourceInput" placeholder="D'où vient l'argent" class="form-input">
           </div>
         </div>
@@ -123,29 +148,33 @@
         <div class="grid grid-2">
           <div class="form-group">
             <label>💸 Sortie (<span class="currency">FCFA</span>)</label>
-            <input type="number" id="sortieInput" placeholder="Montant dépensé" class="form-input">
+            <input type="number" id="sortieInput" placeholder="Montant dépensé" class="form-input" step="0.01">
           </div>
           <div class="form-group">
-            <label>🏷️ Catégorie de dépense</label>
+            <label>🏷️ Catégorie</label>
             <select id="categoryInput" class="form-select">
-              <option value="">-- Choisir une catégorie --</option>
-              <option value="education">📚 Éducation</option>
-              <option value="business">💼 Business</option>
+              <option value="">-- Choisir --</option>
+              <option value="alimentation">🍽️ Alimentation</option>
+              <option value="petites-depenses">☕ Petites dépenses</option>
               <option value="vie-courante">🏠 Vie courante</option>
               <option value="transport">🚗 Transport</option>
-              <option value="personnel">👕 Personnel</option>
+              <option value="sante">💊 Santé</option>
+              <option value="education">📚 Éducation</option>
+              <option value="business">💼 Business</option>
               <option value="investissement">💰 Investissement</option>
-              <option value="dons">🎁 Dons/Aides</option>
+              <option value="personnel">👕 Personnel</option>
+              <option value="loisirs">🎮 Loisirs</option>
               <option value="abonnements">📱 Abonnements</option>
               <option value="voyage">✈️ Voyage</option>
+              <option value="dons">🎁 Dons/Aides</option>
               <option value="autre">❓ Autre</option>
             </select>
           </div>
         </div>
 
         <div class="form-group">
-          <label>📝 Motif / Description</label>
-          <input type="text" id="motifInput" placeholder="Pourquoi cette transaction" class="form-input">
+          <label>📝 Description</label>
+          <input type="text" id="motifInput" placeholder="Détails de la transaction" class="form-input">
         </div>
 
         <button onclick="addTransaction()" class="btn btn-primary">✅ Enregistrer</button>
@@ -200,120 +229,35 @@
       </div>
 
       <div class="card">
-        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">🎯 Répartition Automatique 40/10/10/20/10/10</h3>
+        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">🎯 Répartition 40/10/10/20/10/10</h3>
         <div id="repartitionList"></div>
       </div>
 
       <div class="card">
-        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">🏆 Top 3 Dépenses du Mois</h3>
+        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">🏆 Top 3 Dépenses</h3>
         <div id="top3Depenses"></div>
-      </div>
-    </div>
-
-    <div id="pageSop" style="display: none;">
-      <div class="banner orange">
-        <h2>SOP - Routines Financières</h2>
-        <p>Procédures guidées pour gérer tes finances</p>
-      </div>
-
-      <div class="sop-section">
-        <h3 class="sop-title">🔄 Routine Quotidienne (2 minutes)</h3>
-        <div class="sop-content">
-          <p><strong>1.</strong> Ouvrir l'onglet Saisie</p>
-          <p><strong>2.</strong> Remplir Date, Entrée/Sortie, Catégorie, Motif</p>
-          <p><strong>3.</strong> Enregistrer la transaction</p>
-          <p><strong>4.</strong> Vérifier la recette journalière</p>
-        </div>
-      </div>
-
-      <div class="sop-section">
-        <h3 class="sop-title">📅 Revue Hebdomadaire (Dimanche - 10 min)</h3>
-        <div class="info-box green">
-          <p>✅ Vérifie dans le Dashboard :</p>
-          <ul>
-            <li>Total entrées et sorties de la semaine</li>
-            <li>Recette nette (positif ou négatif ?)</li>
-            <li>Catégorie qui coûte le plus</li>
-            <li>Top 3 des dépenses</li>
-          </ul>
-        </div>
-        <div class="info-box blue">
-          <p>❓ Réponds à ces 5 questions :</p>
-          <ol>
-            <li>Qu'est-ce qui m'a coûté le plus cette semaine ?</li>
-            <li>Est-ce que mes dépenses correspondent à mes priorités ?</li>
-            <li>Quelle entrée je peux multiplier ×2 ?</li>
-            <li>Quelle dépense inutile je peux éliminer ?</li>
-            <li>Que faire la semaine prochaine pour améliorer ?</li>
-          </ol>
-        </div>
-        <div class="info-box orange">
-          <p>🎯 Prends 1 micro-décision :</p>
-          <p style="font-weight: normal;">Augmenter les prix ? Lancer un service ? Réduire une dépense ? Investir une petite somme ? Apprendre quelque chose ?</p>
-        </div>
-      </div>
-
-      <div class="sop-section">
-        <h3 class="sop-title">📊 Revue Mensuelle (1er du mois - 20 min)</h3>
-        <div class="sop-content">
-          <p>✓ Vérifier les cumuls mensuels</p>
-          <p>✓ Analyser les catégories de dépenses</p>
-          <p>✓ Vérifier les répartitions 40/10/10/20/10/10</p>
-          <p>✓ Comparer avec le mois précédent</p>
-          <p>✓ Voir l'évolution sur 3 mois</p>
-        </div>
-        <div class="info-box blue" style="margin-top: 1rem;">
-          <p>🎯 Décider :</p>
-          <ul style="font-weight: normal;">
-            <li>Objectif financier du mois prochain</li>
-            <li>Plan d'action business (une seule priorité)</li>
-            <li>Zone où investir (éducation, business, crypto...)</li>
-            <li>Budget par catégorie</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="sop-section">
-        <h3 class="sop-title">🚀 Revue Trimestrielle (Chaque 90 jours)</h3>
-        <div class="info-box red">
-          <p>🔍 Questions critiques :</p>
-          <ol>
-            <li>Est-ce que mes revenus ont augmenté sur 3 mois ?</li>
-            <li>Quelle offre m'a rapporté le plus ?</li>
-            <li>Quelle catégorie de dépense est devenue inutile ?</li>
-            <li>Quel investissement a été le plus rentable ?</li>
-            <li>Quelle opportunité ai-je ratée ?</li>
-            <li>Mes dépenses suivent-elles mes objectifs de vie ?</li>
-          </ol>
-        </div>
-        <div class="info-box orange" style="margin-top: 1rem;">
-          <p>💡 Décisions stratégiques à prendre :</p>
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; font-weight: normal;">
-            <div>• Améliorer une offre</div>
-            <div>• Arrêter une dépense</div>
-            <div>• Augmenter mes prix</div>
-            <div>• Réinvestir davantage</div>
-            <div>• Épargner plus</div>
-            <div>• Optimiser mon style de vie</div>
-          </div>
-        </div>
       </div>
     </div>
 
     <div id="pageSettings" style="display: none;">
       <div class="banner gray">
         <h2>Paramètres</h2>
-        <p>Configuration de l'application</p>
+        <p>Configuration</p>
       </div>
 
       <div class="card">
         <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">💱 Devise</h3>
-        <div class="grid grid-4" id="currencyButtons"></div>
-        <div style="margin-top: 1rem;">
-          <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">Devise personnalisée :</label>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-bottom: 1rem;">
+          <button onclick="setCurrency('FCFA')" class="btn-curr" data-curr="FCFA">FCFA</button>
+          <button onclick="setCurrency('EUR')" class="btn-curr" data-curr="EUR">EUR</button>
+          <button onclick="setCurrency('USD')" class="btn-curr" data-curr="USD">USD</button>
+          <button onclick="setCurrency('GBP')" class="btn-curr" data-curr="GBP">GBP</button>
+        </div>
+        <div class="form-group">
+          <label>Personnalisée :</label>
           <div style="display: flex; gap: 0.5rem;">
-            <input type="text" id="customCurrency" placeholder="Ex: DZD, TND" class="form-input" style="flex: 1;">
-            <button onclick="setCustomCurrency()" class="btn-small" style="background: #3b82f6; color: white;">Valider</button>
+            <input type="text" id="customCurrency" placeholder="Ex: DZD" class="form-input">
+            <button onclick="setCustomCurrency()" style="padding: 0.75rem 1.5rem; background: #3b82f6; color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer;">OK</button>
           </div>
         </div>
       </div>
@@ -321,92 +265,146 @@
       <div class="card">
         <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">📊 Statistiques</h3>
         <div style="padding: 1rem; background: #f9fafb; border-radius: 0.5rem;">
-          <p style="font-weight: 600; margin-bottom: 0.5rem;">Total transactions : <span id="transCount">0</span></p>
-          <p style="font-weight: 600; margin-bottom: 0.5rem;">Depuis : <span id="firstDate">--</span></p>
-          <p style="font-weight: 600;">Catégorie préférée : <span id="favCategory">--</span></p>
+          <p style="font-weight: 600; margin-bottom: 0.5rem;">Total : <span id="transCount">0</span> transactions</p>
+          <p style="font-weight: 600;">Synchronisation : ✅ Cloud activé</p>
         </div>
-      </div>
-
-      <div class="card">
-        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">💾 Gestion des données</h3>
-        <button onclick="exportData()" class="btn-small" style="width: 100%; margin-bottom: 0.5rem; background: #10b981; color: white;">
-          📥 Télécharger mes données (CSV)
-        </button>
-        <button onclick="resetData()" class="btn btn-danger">
-          🗑️ Réinitialiser toutes les données
-        </button>
-      </div>
-
-      <div style="padding: 1rem; background: #eff6ff; border-radius: 0.5rem; border: 2px solid #3b82f6;">
-        <p style="font-weight: 600; color: #1e40af; margin-bottom: 0.5rem;">💡 À propos</p>
-        <p style="font-size: 0.875rem; color: #1e3a8a;">Système Financier Personnel v2.0</p>
-        <p style="font-size: 0.875rem; color: #1e3a8a;">Plan automatique 40/10/10/20/10/10</p>
-        <p style="font-size: 0.875rem; color: #1e3a8a; margin-top: 0.5rem;">✨ Nouveau : Catégories, analyses et alertes intelligentes</p>
       </div>
     </div>
   </div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, where, orderBy } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+    // ⚠️ REMPLACE LES XXXXX PAR TA VRAIE CLÉ API (celle que tu m'as donnée)
+    const firebaseConfig = {
+      apiKey: "AIzaSyBSKB6Wc7Lr1bHx1wVxC9vTslfVxDwzdFo",
+      authDomain: "suivi-finance-app.firebaseapp.com",
+      projectId: "suivi-finance-app",
+      storageBucket: "suivi-finance-app.firebasestorage.app",
+      messagingSenderId: "66837585354",
+      appId: "1:66837585354:web:4695946822f2f07016c333"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    window.auth = auth;
+    window.db = db;
+    window.collection = collection;
+    window.addDoc = addDoc;
+    window.getDocs = getDocs;
+    window.deleteDoc = deleteDoc;
+    window.doc = doc;
+    window.query = query;
+    window.where = where;
+    window.orderBy = orderBy;
+    window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+    window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+    window.signOut = signOut;
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        document.getElementById('authContainer').style.display = 'none';
+        document.getElementById('mainApp').classList.add('show');
+        document.getElementById('userEmail').textContent = user.email;
+        init();
+      } else {
+        document.getElementById('authContainer').style.display = 'flex';
+        document.getElementById('mainApp').classList.remove('show');
+      }
+    });
+  </script>
 
   <script>
     let currency = 'FCFA';
     let transactions = [];
 
     const categories = {
-      'education': { name: '📚 Éducation', color: '#f59e0b' },
-      'business': { name: '💼 Business', color: '#3b82f6' },
-      'vie-courante': { name: '🏠 Vie courante', color: '#10b981' },
+      'alimentation': { name: '🍽️ Alimentation', color: '#10b981' },
+      'petites-depenses': { name: '☕ Petites dépenses', color: '#f59e0b' },
+      'vie-courante': { name: '🏠 Vie courante', color: '#3b82f6' },
       'transport': { name: '🚗 Transport', color: '#ef4444' },
-      'personnel': { name: '👕 Personnel', color: '#8b5cf6' },
+      'sante': { name: '💊 Santé', color: '#ec4899' },
+      'education': { name: '📚 Éducation', color: '#8b5cf6' },
+      'business': { name: '💼 Business', color: '#06b6d4' },
       'investissement': { name: '💰 Investissement', color: '#14b8a6' },
-      'dons': { name: '🎁 Dons/Aides', color: '#ec4899' },
+      'personnel': { name: '👕 Personnel', color: '#a855f7' },
+      'loisirs': { name: '🎮 Loisirs', color: '#f97316' },
       'abonnements': { name: '📱 Abonnements', color: '#6366f1' },
-      'voyage': { name: '✈️ Voyage', color: '#f97316' },
+      'voyage': { name: '✈️ Voyage', color: '#0ea5e9' },
+      'dons': { name: '🎁 Dons/Aides', color: '#f472b6' },
       'autre': { name: '❓ Autre', color: '#6b7280' }
     };
 
-    function init() {
-      const savedCurrency = localStorage.getItem('currency');
-      if (savedCurrency) currency = savedCurrency;
-      
-      const savedTrans = localStorage.getItem('transactions');
-      if (savedTrans) transactions = JSON.parse(savedTrans);
-      
-      document.getElementById('dateInput').value = new Date().toISOString().split('T')[0];
-      
-      updateCurrencyDisplay();
-      renderTransactions();
-      updateDashboard();
-      renderCurrencyButtons();
+    function showLogin() {
+      document.getElementById('loginForm').style.display = 'block';
+      document.getElementById('signupForm').style.display = 'none';
     }
 
-    function showPage(page) {
-      document.getElementById('pageSaisie').style.display = 'none';
-      document.getElementById('pageDashboard').style.display = 'none';
-      document.getElementById('pageSop').style.display = 'none';
-      document.getElementById('pageSettings').style.display = 'none';
+    function showSignup() {
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('signupForm').style.display = 'block';
+    }
+
+    async function signup() {
+      const email = document.getElementById('signupEmail').value;
+      const password = document.getElementById('signupPassword').value;
       
-      document.getElementById('btnSaisie').className = 'tab';
-      document.getElementById('btnDashboard').className = 'tab';
-      document.getElementById('btnSop').className = 'tab';
-      document.getElementById('btnSettings').className = 'tab';
-      
-      if (page === 'saisie') {
-        document.getElementById('pageSaisie').style.display = 'block';
-        document.getElementById('btnSaisie').className = 'tab active';
-      } else if (page === 'dashboard') {
-        document.getElementById('pageDashboard').style.display = 'block';
-        document.getElementById('btnDashboard').className = 'tab active dashboard';
-        updateDashboard();
-      } else if (page === 'sop') {
-        document.getElementById('pageSop').style.display = 'block';
-        document.getElementById('btnSop').className = 'tab active sop';
-      } else if (page === 'settings') {
-        document.getElementById('pageSettings').style.display = 'block';
-        document.getElementById('btnSettings').className = 'tab active settings';
-        updateSettings();
+      try {
+        await window.createUserWithEmailAndPassword(window.auth, email, password);
+      } catch (error) {
+        document.getElementById('authError').textContent = 'Erreur : ' + error.message;
+        document.getElementById('authError').style.display = 'block';
       }
     }
 
-    function addTransaction() {
+    async function login() {
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      
+      try {
+        await window.signInWithEmailAndPassword(window.auth, email, password);
+      } catch (error) {
+        document.getElementById('authError').textContent = 'Erreur : Email ou mot de passe incorrect';
+        document.getElementById('authError').style.display = 'block';
+      }
+    }
+
+    async function logout() {
+      await window.signOut(window.auth);
+    }
+
+    async function init() {
+      const saved = localStorage.getItem('currency');
+      if (saved) currency = saved;
+      
+      document.getElementById('dateInput').value = new Date().toISOString().split('T')[0];
+      updateCurrencyDisplay();
+      await loadTransactions();
+    }
+
+    async function loadTransactions() {
+      const user = window.auth.currentUser;
+      if (!user) return;
+
+      const q = window.query(
+        window.collection(window.db, 'transactions'),
+        window.where('userId', '==', user.uid),
+        window.orderBy('date', 'desc')
+      );
+
+      const snapshot = await window.getDocs(q);
+      transactions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      
+      renderTransactions();
+      updateDashboard();
+    }
+
+    async function addTransaction() {
       const entree = parseFloat(document.getElementById('entreeInput').value) || 0;
       const sortie = parseFloat(document.getElementById('sortieInput').value) || 0;
       const source = document.getElementById('sourceInput').value;
@@ -415,42 +413,40 @@
       const date = document.getElementById('dateInput').value;
       const recette = entree - sortie;
 
-      const trans = {
-        id: Date.now(),
+      const user = window.auth.currentUser;
+      
+      await window.addDoc(window.collection(window.db, 'transactions'), {
+        userId: user.uid,
         date: date,
         entree: entree,
         source: source,
         sortie: sortie,
         motif: motif,
         category: category,
-        recette: recette
-      };
-
-      transactions.unshift(trans);
-      localStorage.setItem('transactions', JSON.stringify(transactions));
+        recette: recette,
+        createdAt: new Date().toISOString()
+      });
 
       document.getElementById('entreeInput').value = '';
       document.getElementById('sourceInput').value = '';
       document.getElementById('sortieInput').value = '';
       document.getElementById('motifInput').value = '';
       document.getElementById('categoryInput').value = '';
-      document.getElementById('dateInput').value = new Date().toISOString().split('T')[0];
 
-      renderTransactions();
+      await loadTransactions();
     }
 
-    function deleteTransaction(id) {
-      if (confirm('Supprimer cette transaction ?')) {
-        transactions = transactions.filter(t => t.id !== id);
-        localStorage.setItem('transactions', JSON.stringify(transactions));
-        renderTransactions();
+    async function deleteTransaction(id) {
+      if (confirm('Supprimer ?')) {
+        await window.deleteDoc(window.doc(window.db, 'transactions', id));
+        await loadTransactions();
       }
     }
 
     function renderTransactions() {
       const list = document.getElementById('transactionsList');
       if (transactions.length === 0) {
-        list.innerHTML = '<div class="empty-state">Aucune transaction enregistrée</div>';
+        list.innerHTML = '<div class="empty-state">Aucune transaction</div>';
         return;
       }
 
@@ -468,7 +464,7 @@
             ${t.sortie > 0 ? `<div style="color: #dc2626; font-weight: bold;">-${t.sortie.toLocaleString()}</div>` : ''}
             <div style="font-weight: 600; color: ${t.recette >= 0 ? '#2563eb' : '#dc2626'}">${t.recette.toLocaleString()} ${currency}</div>
           </div>
-          <button onclick="deleteTransaction(${t.id})" class="transaction-delete">×</button>
+          <button onclick="deleteTransaction('${t.id}')" class="transaction-delete">×</button>
         </div>
       `}).join('');
     }
@@ -480,75 +476,21 @@
         return td.getMonth() === now.getMonth() && td.getFullYear() === now.getFullYear();
       });
 
-      const lastMonth = transactions.filter(t => {
-        const td = new Date(t.date);
-        const lm = new Date(now.getFullYear(), now.getMonth() - 1);
-        return td.getMonth() === lm.getMonth() && td.getFullYear() === lm.getFullYear();
-      });
-
       const totalE = thisMonth.reduce((sum, t) => sum + t.entree, 0);
       const totalS = thisMonth.reduce((sum, t) => sum + t.sortie, 0);
       const net = totalE - totalS;
-
-      const lastE = lastMonth.reduce((sum, t) => sum + t.entree, 0);
-      const lastS = lastMonth.reduce((sum, t) => sum + t.sortie, 0);
-      const lastNet = lastE - lastS;
 
       document.getElementById('totalEntrees').textContent = `${totalE.toLocaleString()} ${currency}`;
       document.getElementById('totalSorties').textContent = `${totalS.toLocaleString()} ${currency}`;
       document.getElementById('totalNet').textContent = `${net.toLocaleString()} ${currency}`;
       document.getElementById('totalNet').className = `stat-value ${net >= 0 ? 'text-blue' : 'text-red'}`;
 
-      // Comparaison avec mois précédent
-      if (lastE > 0) {
-        const diffE = totalE - lastE;
-        const percE = ((diffE / lastE) * 100).toFixed(1);
-        document.getElementById('compareEntrees').innerHTML = diffE >= 0 
-          ? `<span style="color: #16a34a;">↗ +${percE}% vs mois dernier</span>`
-          : `<span style="color: #dc2626;">↘ ${percE}% vs mois dernier</span>`;
-      }
-
-      if (lastS > 0) {
-        const diffS = totalS - lastS;
-        const percS = ((diffS / lastS) * 100).toFixed(1);
-        document.getElementById('compareSorties').innerHTML = diffS >= 0 
-          ? `<span style="color: #dc2626;">↗ +${percS}% vs mois dernier</span>`
-          : `<span style="color: #16a34a;">↘ ${percS}% vs mois dernier</span>`;
-      }
-
-      if (lastNet !== 0) {
-        const diffNet = net - lastNet;
-        const percNet = ((diffNet / Math.abs(lastNet)) * 100).toFixed(1);
-        document.getElementById('compareNet').innerHTML = diffNet >= 0 
-          ? `<span style="color: #16a34a;">↗ +${percNet}% vs mois dernier</span>`
-          : `<span style="color: #dc2626;">↘ ${percNet}% vs mois dernier</span>`;
-      }
-
-      // Alertes intelligentes
       renderAlerts(totalE, totalS, net);
-
-      // Statistiques par catégorie
       renderCategoryStats(thisMonth, totalS);
-
-      // Répartition
-      const repartition = [
-        { name: 'Compte Courant (40%)', value: net * 0.4 },
-        { name: 'Investissement (10%)', value: net * 0.1 },
-        { name: 'Épargne LT (10%)', value: net * 0.1 },
-        { name: 'Éducation (20%)', value: net * 0.2 },
-        { name: 'Dons (10%)', value: net * 0.1 },
-        { name: 'Libre (10%)', value: net * 0.1 }
-      ];
-
-      document.getElementById('repartitionList').innerHTML = repartition.map(r => `
-        <div class="repartition-item">
-          <span style="font-weight: 600;">${r.name}</span>
-          <span style="font-weight: bold;">${r.value.toLocaleString()} ${currency}</span>
-        </div>
-      `).join('');
-
-      // Top 3 dépenses
+      renderRepartition(net);
       renderTop3(thisMonth);
+      
+      document.getElementById('transCount').textContent = transactions.length;
     }
 
     function renderAlerts(totalE, totalS, net) {
@@ -556,7 +498,7 @@
       let html = '';
 
       if (net < 0) {
-        html += '<div class="alert danger">⚠️ Attention ! Tes dépenses dépassent tes revenus ce mois-ci</div>';
+        html += '<div class="alert danger">⚠️ Attention ! Tes dépenses dépassent tes revenus</div>';
       } else if (net > 0 && totalE > 0) {
         const ratio = (net / totalE) * 100;
         if (ratio >= 30) {
@@ -596,7 +538,7 @@
       const container = document.getElementById('categoriesStats');
       
       if (sorted.length === 0) {
-        container.innerHTML = '<div class="empty-state">Aucune dépense catégorisée ce mois</div>';
+        container.innerHTML = '<div class="empty-state">Aucune dépense catégorisée</div>';
         return;
       }
 
@@ -619,6 +561,24 @@
       }).join('');
     }
 
+    function renderRepartition(net) {
+      const repartition = [
+        { name: 'Compte Courant (40%)', value: net * 0.4 },
+        { name: 'Investissement (10%)', value: net * 0.1 },
+        { name: 'Épargne LT (10%)', value: net * 0.1 },
+        { name: 'Éducation (20%)', value: net * 0.2 },
+        { name: 'Dons (10%)', value: net * 0.1 },
+        { name: 'Libre (10%)', value: net * 0.1 }
+      ];
+
+      document.getElementById('repartitionList').innerHTML = repartition.map(r => `
+        <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: #f9fafb; border-radius: 0.5rem; margin-bottom: 0.5rem;">
+          <span style="font-weight: 600;">${r.name}</span>
+          <span style="font-weight: bold;">${r.value.toLocaleString()} ${currency}</span>
+        </div>
+      `).join('');
+    }
+
     function renderTop3(monthData) {
       const sorted = monthData
         .filter(t => t.sortie > 0)
@@ -628,7 +588,7 @@
       const container = document.getElementById('top3Depenses');
       
       if (sorted.length === 0) {
-        container.innerHTML = '<div class="empty-state">Aucune dépense ce mois</div>';
+        container.innerHTML = '<div class="empty-state">Aucune dépense</div>';
         return;
       }
 
@@ -654,9 +614,39 @@
       }).join('');
     }
 
+    function showPage(page) {
+      document.getElementById('pageSaisie').style.display = 'none';
+      document.getElementById('pageDashboard').style.display = 'none';
+      document.getElementById('pageSettings').style.display = 'none';
+      
+      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+      
+      if (page === 'saisie') {
+        document.getElementById('pageSaisie').style.display = 'block';
+        document.getElementById('btnSaisie').classList.add('active');
+      } else if (page === 'dashboard') {
+        document.getElementById('pageDashboard').style.display = 'block';
+        document.getElementById('btnDashboard').classList.add('active');
+        updateDashboard();
+      } else if (page === 'settings') {
+        document.getElementById('pageSettings').style.display = 'block';
+        document.getElementById('btnSettings').classList.add('active');
+      }
+    }
+
     function updateCurrencyDisplay() {
       document.getElementById('currencyDisplay').textContent = currency;
       document.querySelectorAll('.currency').forEach(el => el.textContent = currency);
+      
+      document.querySelectorAll('.btn-curr').forEach(btn => {
+        if (btn.dataset.curr === currency) {
+          btn.style.background = '#3b82f6';
+          btn.style.color = 'white';
+        } else {
+          btn.style.background = '#f3f4f6';
+          btn.style.color = '#374151';
+        }
+      });
     }
 
     function setCurrency(curr) {
@@ -665,7 +655,6 @@
       updateCurrencyDisplay();
       renderTransactions();
       updateDashboard();
-      renderCurrencyButtons();
     }
 
     function setCustomCurrency() {
@@ -676,73 +665,30 @@
       }
     }
 
-    function renderCurrencyButtons() {
-      const currencies = ['FCFA', 'EUR', 'USD', 'GBP', 'CAD', 'CHF', 'XOF', 'MAD'];
-      document.getElementById('currencyButtons').innerHTML = currencies.map(c => `
-        <button onclick="setCurrency('${c}')" class="btn-small ${currency === c ? 'active' : ''}">
-          ${c}
-        </button>
-      `).join('');
-    }
-
-    function updateSettings() {
-      document.getElementById('transCount').textContent = transactions.length;
-      
-      if (transactions.length > 0) {
-        const dates = transactions.map(t => new Date(t.date)).sort((a, b) => a - b);
-        document.getElementById('firstDate').textContent = dates[0].toLocaleDateString('fr-FR');
-        
-        const catCount = {};
-        transactions.forEach(t => {
-          if (t.category) {
-            catCount[t.category] = (catCount[t.category] || 0) + 1;
-          }
-        });
-        
-        const favCat = Object.entries(catCount).sort((a, b) => b[1] - a[1])[0];
-        if (favCat) {
-          const catInfo = categories[favCat[0]];
-          document.getElementById('favCategory').textContent = catInfo.name;
-        }
-      }
-    }
-
-    function exportData() {
-      if (transactions.length === 0) {
-        alert('Aucune donnée à exporter');
-        return;
-      }
-
-      let csv = 'Date,Entrée,Source,Sortie,Catégorie,Motif,Recette\n';
-      
-      transactions.forEach(t => {
-        const catInfo = t.category ? categories[t.category].name : '';
-        csv += `${t.date},${t.entree},"${t.source}",${t.sortie},"${catInfo}","${t.motif}",${t.recette}\n`;
-      });
-
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `finances_${new Date().toISOString().split('T')[0]}.csv`;
-      a.click();
-      window.URL.revokeObjectURL(url);
-    }
-
-    function resetData() {
-      if (confirm('⚠️ ATTENTION ! Supprimer toutes les données ? Cette action est irréversible !')) {
-        if (confirm('Es-tu vraiment sûr ? Toutes tes transactions seront perdues !')) {
-          transactions = [];
-          localStorage.setItem('transactions', JSON.stringify(transactions));
-          renderTransactions();
-          updateDashboard();
-          updateSettings();
-          alert('✅ Toutes les données ont été supprimées');
-        }
-      }
-    }
-
-    window.onload = init;
+    window.showLogin = showLogin;
+    window.showSignup = showSignup;
+    window.signup = signup;
+    window.login = login;
+    window.logout = logout;
+    window.addTransaction = addTransaction;
+    window.deleteTransaction = deleteTransaction;
+    window.showPage = showPage;
+    window.setCurrency = setCurrency;
+    window.setCustomCurrency = setCustomCurrency;
   </script>
+
+  <style>
+    .btn-curr {
+      padding: 0.75rem 1rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-curr:hover {
+      transform: translateY(-2px);
+    }
+  </style>
 </body>
 </html>
